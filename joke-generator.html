@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Joke Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .joke-container {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .joke-text {
+            font-size: 18px;
+            color: #333;
+            line-height: 1.6;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .joke-setup {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .joke-punchline {
+            margin-top: 15px;
+            color: #764ba2;
+            font-style: italic;
+        }
+
+        .loading-text {
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .secondary-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .category-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .category-select:focus {
+            border-color: #667eea;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: slideIn 0.3s ease-in-out;
+        }
+
+        .joke-counter {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+
+        .rating {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .rating p {
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .star {
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 0 5px;
+            display: inline-block;
+        }
+
+        .star:hover {
+            transform: scale(1.2);
+        }
+
+        .star.filled {
+            color: #ffc107;
+        }
+
+        .info-section {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>😂 Joke Generator</h1>
+            <p>Get random jokes and laugh out loud!</p>
+        </div>
+
+        <select id="categorySelect" class="category-select">
+            <option value="">All Categories</option>
+            <option value="general">General</option>
+            <option value="programming">Programming</option>
+            <option value="knock-knock">Knock-Knock</option>
+        </select>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="joke-container">
+            <div class="joke-text" id="jokeText">
+                <span class="loading-text">🤔 Loading a funny joke...</span>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button id="newJokeBtn" onclick="generateJoke()">Get New Joke 😄</button>
+            <button id="copyBtn" class="secondary-btn" onclick="copyJoke()">Copy Joke 📋</button>
+            <button id="shareBtn" class="secondary-btn" onclick="shareJoke()">Share 🔗</button>
+        </div>
+
+        <div class="rating">
+            <p>Rate this joke:</p>
+            <div id="stars"></div>
+        </div>
+
+        <div class="joke-counter">
+            <p>Jokes loaded: <span id="jokeCount">0</span></p>
+        </div>
+
+        <div class="info-section">
+            <strong>💡 Tip:</strong> Click "Get New Joke" or select a category to filter jokes. You can also rate jokes you like!
+        </div>
+    </div>
+
+    <script src="joke-generator.js"></script>
+</body>
+</html>
